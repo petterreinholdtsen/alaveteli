@@ -8,6 +8,12 @@ OUTPUT=$(mktemp -t foi-mailin-output-XXXXXXXX)
 # Read the email message from stdin, and write it to the file $INPUT
 cat >"$INPUT"
 
+# REMOVEME: a temporary addition to problematic emails
+if egrep 'Message-ID: <(705992984.98893048432328@kotinet.com|644382207.35553439101045@colpal.com|39254373190905392554423417633590@vdv5pz82.sylmarpiabawe.us)>' "$INPUT" > /dev/null
+then
+    exit 0
+fi
+
 cd "$(dirname "$0")"/..
 source commonlib/shlib/deployfns
 
