@@ -55,6 +55,25 @@ describe PublicBody do
                 I18n.with_locale(:es) { expect(body.name).to eq('Renamed') }
             end
 
+            it 'updates an existing translation and creates a new translation' do
+                body = public_bodies(:geraldine_public_body)
+                translation = body.translation_for(:es)
+
+                body.translated_versions = {
+                    translation.id.to_sym => {
+                        :locale => 'es',
+                        :name => 'Renamed'
+                    },
+                    :new_translation => {
+                        :locale => 'fr',
+                        :name => 'Le Geraldine Quango'
+                    }
+                }
+
+                expect(body.translations.size).to eq(3)
+                I18n.with_locale(:es) { expect(body.name).to eq('Renamed') }
+            end
+
             it 'skips empty translations' do
                 body = public_bodies(:geraldine_public_body)
                 translation = body.translation_for(:es)
