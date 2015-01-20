@@ -69,6 +69,7 @@ describe PublicBody do
 
                 expect(body.translations.size).to eq(3)
                 I18n.with_locale(:es) { expect(body.name).to eq('Renamed') }
+                I18n.with_locale(:fr) { expect(body.name).to eq('Le Geraldine Quango') }
             end
 
             it 'skips empty translations' do
