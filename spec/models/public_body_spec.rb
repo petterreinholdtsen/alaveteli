@@ -43,21 +43,18 @@ describe PublicBody do
             it 'updates an existing translation' do
                 body = public_bodies(:geraldine_public_body)
                 translation = body.translation_for(:es)
+                params = { translation.id.to_sym => { :locale => 'es',
+                                                      :name => 'Renamed' } }
 
-                body.translated_versions = {
-                    translation.id.to_sym => {
-                        :locale => 'es',
-                        :name => 'Renamed'
-                    }
-                }
-
-                expect(body.translations.size).to eq(2)
+                body.translated_versions = params
                 I18n.with_locale(:es) { expect(body.name).to eq('Renamed') }
             end
 
             it 'updates an existing translation and creates a new translation' do
                 body = public_bodies(:geraldine_public_body)
                 translation = body.translation_for(:es)
+
+                expect(body.translations.size).to eq(2)
 
                 body.translated_versions = {
                     translation.id.to_sym => {
@@ -77,6 +74,8 @@ describe PublicBody do
             it 'skips empty translations' do
                 body = public_bodies(:geraldine_public_body)
                 translation = body.translation_for(:es)
+
+                expect(body.translations.size).to eq(2)
 
                 body.translated_versions = {
                     translation.id.to_sym => {
@@ -106,6 +105,8 @@ describe PublicBody do
                 body.translation_for(:es).destroy
                 body.reload
 
+                expect(body.translations.size).to eq(1)
+
                 body.translated_versions = [ {
                         :locale => 'es',
                         :name => 'Renamed'
@@ -117,14 +118,17 @@ describe PublicBody do
             end
 
             it 'skips empty translations' do
-                body = FactoryGirl.create(:public_body)
+                body = public_bodies(:geraldine_public_body)
+                body.translation_for(:es).destroy
+                body.reload
+
+                expect(body.translations.size).to eq(1)
 
                 body.translated_versions = [
-                    { :locale => 'es', :name => 'Renamed' },
                     { :locale => 'empty' }
                 ]
 
-                expect(body.translations.size).to eq(2)
+                expect(body.translations.size).to eq(1)
             end
 
         end
