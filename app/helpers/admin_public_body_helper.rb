@@ -7,12 +7,12 @@ module AdminPublicBodyHelper
             object = public_body
         else
             # ...but additional locales go "on the side"
-            prefix = 'public_body[translated_versions][]'
+            prefix = :translations
             object = if public_body.new_record?
-                         PublicBody::Translation.new
-                     else
-                        public_body.find_translation_by_locale(locale.to_s)
-                     end
+                 PublicBody::Translation.new
+            else
+                 public_body.find_translation_by_locale(locale.to_s)
+            end
             object ||= PublicBody::Translation.new
         end
 

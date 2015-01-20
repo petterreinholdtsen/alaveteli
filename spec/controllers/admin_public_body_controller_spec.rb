@@ -88,10 +88,10 @@ describe AdminPublicBodyController, "when creating a public body" do
                               :tag_string => "blah",
                               :request_email => 'newquango@localhost',
                               :last_edit_comment => 'From test code',
-                :translated_versions => [{ :locale => "es",
-                                           :name => "Mi Nuevo Quango",
-                                           :short_name => "",
-                                           :request_email => 'newquango@localhost' }]
+                :translations_attributes => [{ :locale => "es",
+                                    :name => "Mi Nuevo Quango",
+                                    :short_name => "",
+                                    :request_email => 'newquango@localhost' }]
                 }
         }
         PublicBody.count.should == n + 1
@@ -208,7 +208,7 @@ describe AdminPublicBodyController, "when updating a public body" do
                     :tag_string => "some tags",
                     :request_email => 'edited@localhost',
                     :last_edit_comment => 'From test code',
-                    :translated_versions => {
+                    :translations_attributes => {
                         3 => {:locale => "es",
                               :name => "Renamed",
                               :short_name => "",
