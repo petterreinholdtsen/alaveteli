@@ -557,7 +557,7 @@ class PublicBody < ActiveRecord::Base
                 else
                     changed[field_name] = "#{read_attribute_value(field_name, locale)}: #{value}"
                 end
-                send("#{field_name}=", value)
+                assign_attributes({ field_name => value })
             end
         end
         changed
