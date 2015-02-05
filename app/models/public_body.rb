@@ -534,15 +534,6 @@ class PublicBody < ActiveRecord::Base
         (locale.to_s == I18n.default_locale.to_s) ? field_name : "#{field_name}.#{locale}"
     end
 
-    # Read an attribute value (without using locale fallbacks if the attribute is translated)
-    def read_attribute_value(name, locale)
-      if self.class.translates.include?(name.to_sym)
-          globalize.stash.contains?(locale, name) ? globalize.stash.read(locale, name) : translation_for(locale).send(name)
-      else
-          self.send(name)
-      end
-    end
-
     # Sets attribute values for a locale from a csv row
     def set_locale_fields_from_csv_row(is_new, locale, row, options)
         changed = ActiveSupport::OrderedHash.new
@@ -806,6 +797,15 @@ class PublicBody < ActiveRecord::Base
     end
 
     private
+
+    # Read an attribute value (without using locale fallbacks if the attribute is translated)
+    def read_attribute_value(name, locale)
+      if self.class.translates.include?(name.to_sym)
+          globalize.stash.contains?(locale, name) ? globalize.stash.read(locale, name) : translation_for(locale).send(name)
+      else
+          self.send(name)
+      end
+    end
 
     def request_email_if_requestable
         # Request_email can be blank, meaning we don't have details
