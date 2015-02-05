@@ -801,7 +801,11 @@ class PublicBody < ActiveRecord::Base
     # Read an attribute value (without using locale fallbacks if the attribute is translated)
     def read_attribute_value(name, locale)
       if self.class.translates.include?(name.to_sym)
-          globalize.stash.contains?(locale, name) ? globalize.stash.read(locale, name) : translation_for(locale).send(name)
+          if globalize.stash.contains?(locale, name)
+              globalize.stash.read(locale, name)
+          else
+              translation_for(locale).send(name)
+          end
       else
           self.send(name)
       end
