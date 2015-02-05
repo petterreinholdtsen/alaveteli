@@ -544,13 +544,10 @@ class PublicBody < ActiveRecord::Base
             value = column && row[column]
             # Tags are a special case, as we support adding to the field, not just setting a new value
             if field_name == 'tag_string'
-                if value.nil?
-                    value = options[:tag] unless options[:tag].empty?
-                else
-                    if options[:tag_behaviour] == 'add'
-                        value = "#{value} #{options[:tag]}" unless options[:tag].empty?
-                        value = "#{value} #{tag_string}"
-                    end
+                value ||= options[:tag] unless options[:tag].empty?
+                if options[:tag_behaviour] == 'add'
+                    value = "#{value} #{options[:tag]}" unless options[:tag].empty?
+                    value = "#{value} #{tag_string}"
                 end
             end
 
