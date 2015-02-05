@@ -807,7 +807,7 @@ class PublicBody < ActiveRecord::Base
               translation_for(locale).send(name)
           end
       else
-          self.send(name)
+          send(name)
       end
     end
 
