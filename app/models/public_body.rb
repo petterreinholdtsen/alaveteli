@@ -534,6 +534,40 @@ class PublicBody < ActiveRecord::Base
         (locale.to_s == I18n.default_locale.to_s) ? field_name : "#{field_name}.#{locale}"
     end
 
+    # import values from a csv row (that may include localized columns)
+    def import_values_from_csv_row(row, line, name, options)
+        is_new = new_record?
+        edit_info = if is_new
+            { :action => "creating new authority",
+              :comment => 'Created from spreadsheet' }
+        else
+            { :action => "updating authority",
+              :comment => 'Updated from spreadsheet' }
+        end
+        locales = options[:available_locales]
+        locales = [I18n.default_locale] if locales.empty?
+        locales.each do |locale|
+            I18n.with_locale(locale) do
+                changed = set_locale_fields_from_csv_row(is_new, locale, row, options)
+                unless changed.empty?
+                    options[:notes].push "line #{ line }: #{ edit_info[:action] } '#{ name }' (locale: #{ locale }):\n\t#{ changed.to_json }"
+                    self.last_edit_comment = edit_info[:comment]
+                    self.publication_scheme = publication_scheme || ""
+                    self.last_edit_editor = options[:editor]
+
+                    begin
+                        save!
+                    rescue ActiveRecord::RecordInvalid
+                        errors.full_messages.each do |msg|
+                            options[:errors].push "error: line #{ line }: #{ msg } for authority '#{ name }'"
+                        end
+                        next
+                    end
+                end
+            end
+        end
+    end
+
     # Sets attribute values for a locale from a csv row
     def set_locale_fields_from_csv_row(is_new, locale, row, options)
         changed = ActiveSupport::OrderedHash.new
@@ -561,40 +595,6 @@ class PublicBody < ActiveRecord::Base
             end
         end
         changed
-    end
-
-    # import values from a csv row (that may include localized columns)
-    def import_values_from_csv_row(row, line, name, options)
-        is_new = new_record?
-        if is_new
-            action = "creating new authority"
-            edit_comment = 'Created from spreadsheet'
-        else
-            action = "updating authority"
-            edit_comment = 'Updated from spreadsheet'
-        end
-        locales = options[:available_locales]
-        locales = [I18n.default_locale] if locales.empty?
-        locales.each do |locale|
-            I18n.with_locale(locale) do
-                changed = set_locale_fields_from_csv_row(is_new, locale, row, options)
-                unless changed.empty?
-                    options[:notes].push "line #{ line }: #{ action } '#{ name }' (locale: #{ locale }):\n\t#{ changed.to_json }"
-                    self.last_edit_comment = edit_comment
-                    self.publication_scheme = publication_scheme || ""
-                    self.last_edit_editor = options[:editor]
-
-                    begin
-                        save!
-                    rescue ActiveRecord::RecordInvalid
-                        errors.full_messages.each do |msg|
-                            options[:errors].push "error: line #{ line }: #{ msg } for authority '#{ name }'"
-                        end
-                        next
-                    end
-                end
-            end
-        end
     end
 
     # Does this user have the power of FOI officer for this body?
