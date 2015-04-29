@@ -20,6 +20,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe OutgoingMessage do
 
+    describe :initialize do
+
+        it 'does not censor the #body' do
+          attrs = { :status => 'ready',
+                    :message_type => 'initial_request',
+                    :body => 'abc',
+                    :what_doing => 'normal_sort' }
+
+          message = FactoryGirl.create(:outgoing_message, attrs)
+
+          OutgoingMessage.any_instance.should_not_receive(:body).and_call_original
+          OutgoingMessage.find(message.id)
+        end
+
+    end
+
     describe :body do
 
         it 'caches the body text' do
