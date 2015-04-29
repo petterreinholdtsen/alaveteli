@@ -804,7 +804,8 @@ public
 
     # Text from the the initial request, for use in summary display
     def initial_request_text
-        outgoing_messages.first.try(:get_text_for_indexing) or ''
+        body_opts = { :censor_rules => applicable_censor_rules }
+        outgoing_messages.first.try(:get_text_for_indexing, true, body_opts) or ''
     end
 
     # Returns index of last event which is described or nil if none described.
