@@ -140,18 +140,19 @@ class OutgoingMessage < ActiveRecord::Base
         end
     end
 
-    def body
+    def body(options = {})
         text = raw_body.dup
         return text if text.nil?
 
         text = clean_text(text)
 
-        # Remove things from censor rules
-        unless info_request.nil?
-            self.info_request.apply_censor_rules_to_text!(text)
+        # Use the given censor_rules; otherwise fetch them from the associated
+        # info_request
+        censor_rules = options.fetch(:censor_rules) do
+            info_request.try(:applicable_censor_rules) or []
         end
 
-        text
+        censor_rules.reduce(text) { |text, rule| rule.apply_to_text(text) }
     end
 
     def raw_body

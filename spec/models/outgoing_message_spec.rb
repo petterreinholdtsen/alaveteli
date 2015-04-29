@@ -68,20 +68,37 @@ describe OutgoingMessage do
             expect(message.body).to eq("ab\n\nc")
         end
 
-        it 'applies censor rules to the text' do
-            rules = [FactoryGirl.build(:censor_rule, :text => 'secret'),
-                     FactoryGirl.build(:censor_rule, :text => 'sensitive')]
-            InfoRequest.any_instance.stub(:censor_rules).and_return(rules)
-
+        it "applies the associated request's censor rules to the text" do
             attrs = { :status => 'ready',
                       :message_type => 'initial_request',
                       :body => 'This sensitive text contains secret info!',
                       :what_doing => 'normal_sort' }
-
             message = FactoryGirl.build(:outgoing_message, attrs)
+
+            rules = [FactoryGirl.build(:censor_rule, :text => 'secret'),
+                     FactoryGirl.build(:censor_rule, :text => 'sensitive')]
+            InfoRequest.any_instance.stub(:censor_rules).and_return(rules)
 
             expected = 'This [REDACTED] text contains [REDACTED] info!'
             expect(message.body).to eq(expected)
+        end
+
+        it "applies the given censor rules to the text" do
+            attrs = { :status => 'ready',
+                      :message_type => 'initial_request',
+                      :body => 'This sensitive text contains secret info!',
+                      :what_doing => 'normal_sort' }
+            message = FactoryGirl.build(:outgoing_message, attrs)
+
+            request_rules = [FactoryGirl.build(:censor_rule, :text => 'secret'),
+                             FactoryGirl.build(:censor_rule, :text => 'sensitive')]
+            InfoRequest.any_instance.stub(:censor_rules).and_return(request_rules)
+
+            censor_rules = [FactoryGirl.build(:censor_rule, :text => 'text'),
+                            FactoryGirl.build(:censor_rule, :text => 'contains')]
+
+            expected = 'This sensitive [REDACTED] [REDACTED] secret info!'
+            expect(message.body(:censor_rules => censor_rules)).to eq(expected)
         end
 
     end
