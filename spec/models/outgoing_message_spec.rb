@@ -144,6 +144,7 @@ describe OutgoingMessage, " when making an outgoing message" do
         info_request = mock_model(InfoRequest, :public_body => public_body,
                                                :url_title => 'a_test_title',
                                                :title => 'A test title',
+                                               :applicable_censor_rules => [],
                                                :apply_censor_rules_to_text! => nil,
                                                :is_batch_request_template? => false)
         outgoing_message = OutgoingMessage.new({
