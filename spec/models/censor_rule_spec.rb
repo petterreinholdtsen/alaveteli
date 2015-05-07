@@ -34,6 +34,11 @@ describe CensorRule do
             expect(text).to eq('Some secret text')
         end
 
+        it 'returns the text if the rule is unmatched' do
+            rule = FactoryGirl.build(:censor_rule, :text => 'secret')
+            text = 'Some text'
+            expect(rule.apply_to_text(text)).to eq('Some text')
+        end
     end
 
     describe :apply_to_text! do

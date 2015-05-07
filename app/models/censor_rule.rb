@@ -44,7 +44,7 @@ class CensorRule < ActiveRecord::Base
 
     def apply_to_text(text_to_censor)
         return nil if text_to_censor.nil?
-        apply_to_text!(text_to_censor.dup)
+        text_to_censor.gsub(to_replace, replacement)
     end
 
     def apply_to_text!(text_to_censor)
