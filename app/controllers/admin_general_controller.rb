@@ -8,16 +8,23 @@ class AdminGeneralController < AdminController
 
     def index
         # Overview counts of things
-        @public_body_count = PublicBody.count
+        models = [PublicBody,
+                  InfoRequest,
+                  OutgoingMessage,
+                  IncomingMessage,
+                  User,
+                  TrackThing,
+                  Comment]
 
-        @info_request_count = InfoRequest.count
-        @outgoing_message_count = OutgoingMessage.count
-        @incoming_message_count = IncomingMessage.count
+        counter = RecordCounter.new(*models).run
 
-        @user_count = User.count
-        @track_thing_count = TrackThing.count
-
-        @comment_count = Comment.count
+        @public_body_count = counter.public_bodies
+        @info_request_count = counter.info_requests
+        @outgoing_message_count = counter.outgoing_messages
+        @incoming_message_count = counter.incoming_messages
+        @user_count = counter.users
+        @track_thing_count = counter.track_things
+        @comment_count = counter.comments
 
         # Tasks to do
         @requires_admin_requests = InfoRequest.find_in_state('requires_admin')
