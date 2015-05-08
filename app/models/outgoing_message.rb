@@ -140,6 +140,15 @@ class OutgoingMessage < ActiveRecord::Base
         end
     end
 
+    # Public: The body text of the OutgoingMessage. The text is cleaned and
+    # CensorRules are applied.
+    #
+    # options - Hash of options
+    #           :censor_rules - Array of CensorRules to apply. Defaults to the
+    #                           applicable_censor_rules of the associated
+    #                           InfoRequest. (optional)
+    #
+    # Returns a String
     def body(options = {})
         text = raw_body.dup
         return text if text.nil?
